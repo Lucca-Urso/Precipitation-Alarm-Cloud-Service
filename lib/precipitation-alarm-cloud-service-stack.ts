@@ -5,6 +5,7 @@ import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as sns from 'aws-cdk-lib/aws-sns'
 import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
 export class PrecipitationAlarmCloudServiceStack extends cdk.Stack {
@@ -19,10 +20,17 @@ export class PrecipitationAlarmCloudServiceStack extends cdk.Stack {
     });
 
     precipitationAnalyzerLambda.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);
+    precipitationAnalyzerLambda.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['ssm:GetParameter'],
+      resources: [`arn:aws:ssm:${this.region}:${this.account}:parameter/windy/api-key`]
+    }));
 
     // EventBridge Configuration
     const precipitationRule = new events.Rule(this, "PrecipitationRule", {
-      schedule: events.Schedule.rate(cdk.Duration.minutes(15)),
+      schedule: events.Schedule.cron({
+        minute: '0',
+        hour: '0/3'
+      })
     });
 
     precipitationRule.addTarget(new targets.LambdaFunction(precipitationAnalyzerLambda));
@@ -42,7 +50,7 @@ export class PrecipitationAlarmCloudServiceStack extends cdk.Stack {
 
     // SNS Topic Configuration
     const precipitationEvaluationNotification = new sns.Topic(this, "precipitationEvaluationNotification");
-    
+
     precipitationEvaluationNotification.addSubscription(new subscriptions.SmsSubscription("+5511942721988"));
     precipitationEvaluationNotification.grantPublish(precipitationAnalyzerLambda);
     precipitationAnalyzerLambda.addEnvironment('SNS_TOPIC_ARN', precipitationEvaluationNotification.topicArn);
