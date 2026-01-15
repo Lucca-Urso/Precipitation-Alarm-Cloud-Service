@@ -15,8 +15,9 @@ export class PrecipitationAlarmCloudServiceStack extends cdk.Stack {
     // Lambda Configuration
     const precipitationAnalyzerLambda = new lambda.Function(this, "PrecipitationAnalyzerLambda", {
       runtime: lambda.Runtime.JAVA_21,
-      handler: 'main.java.example.PrecipitationAnalyzerLambda::handleRequest',
+      handler: 'handler.PrecipitationAnalyzerLambda::handleRequest',
       code: lambda.Code.fromAsset('build/distributions/precipitation-alarm-cloud-service.zip'),
+      timeout: cdk.Duration.minutes(1),
     });
 
     precipitationAnalyzerLambda.applyRemovalPolicy(cdk.RemovalPolicy.DESTROY);

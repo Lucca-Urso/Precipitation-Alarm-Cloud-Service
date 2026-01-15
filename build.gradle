@@ -9,6 +9,8 @@ repositories {
 dependencies {
     implementation 'com.amazonaws:aws-lambda-java-core:1.2.3'
     implementation 'software.amazon.awssdk:s3:2.28.29'
+    implementation 'software.amazon.awssdk:dynamodb:2.28.29'
+    implementation 'software.amazon.awssdk:dynamodb-enhanced:2.28.29'
     implementation 'com.amazonaws:aws-lambda-java-log4j2:1.6.0'
     implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.17.1'
     implementation 'org.json:json:20230227'
