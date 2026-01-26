@@ -13,7 +13,6 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 public class PrecipitationRecordsRepository {
     private String latitude;
     private String longitude;
-    private final long threeHoursInMili = 10800000;
 
     private final DynamoDbTable<PrecipitationRecordsModel> table = DynamoDbEnhancedClient.builder()
         .dynamoDbClient(DynamoDbClient.create())
@@ -36,7 +35,11 @@ public class PrecipitationRecordsRepository {
         precipitationRecords.setHumidity(responseBody.get("rh-surface"));
 
         if (isRaining) {
-            precipitationRecords.setLastAlertAt(Instant.ofEpochMilli(responseBody.get("timestamp") - threeHoursInMili).toString());
+            precipitationRecords.setLastAlertAt(
+                Instant.ofEpochMilli(responseBody.get("timestamp"))
+                    .atZone(java.time.ZoneOffset.ofHours(-3))
+                    .toString()
+            );
         }
 
         table.putItem(precipitationRecords);

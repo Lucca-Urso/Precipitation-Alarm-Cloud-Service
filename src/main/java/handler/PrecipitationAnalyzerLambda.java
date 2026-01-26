@@ -44,8 +44,8 @@ public class PrecipitationAnalyzerLambda implements RequestHandler<Map<String, O
             Map<String, Long> currentResponse = parseResponseBodyByCurrentDate(response, currentDate);
             Map<String, Long> previousResponse = parseResponseBodyByCurrentDate(response, currentDate - threeHoursInMili);
 
-            log.info("Windy API request returned status {} with body: \n{}", 
-                response.statusCode(), currentResponse);
+            log.info("Windy API request returned status {} with body: \n{}.\nPrevious weather response was {}", 
+                response.statusCode(), currentResponse, previousResponse);
 
             if (currentResponse.get("ptype-surface") != previousResponse.get("ptype-surface")) {
                 log.info("Precipitation type changed from {} to {}. Writing response in PrecipitationRecords",
