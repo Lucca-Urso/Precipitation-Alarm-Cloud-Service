@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="10.12.5">
+<file name="C:\Users\Urso\OneDrive\Documents\ProgrammingProjects\Typescript\Precipitation-Alarm-Cloud-Service\src\main\java\handler\PrecipitationAnalyzerLambda.java">
+</file>
+<file name="C:\Users\Urso\OneDrive\Documents\ProgrammingProjects\Typescript\Precipitation-Alarm-Cloud-Service\src\main\java\model\PrecipitationRecordsModel.java">
+</file>
+<file name="C:\Users\Urso\OneDrive\Documents\ProgrammingProjects\Typescript\Precipitation-Alarm-Cloud-Service\src\main\java\repository\PrecipitationRecordsRepository.java">
+</file>
+<file name="C:\Users\Urso\OneDrive\Documents\ProgrammingProjects\Typescript\Precipitation-Alarm-Cloud-Service\src\main\java\service\SmsNotificationService.java">
+</file>
+<file name="C:\Users\Urso\OneDrive\Documents\ProgrammingProjects\Typescript\Precipitation-Alarm-Cloud-Service\src\main\java\service\SsmService.java">
+</file>
+</checkstyle>

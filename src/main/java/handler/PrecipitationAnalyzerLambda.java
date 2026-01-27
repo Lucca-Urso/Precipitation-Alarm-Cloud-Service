@@ -12,6 +12,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +29,10 @@ public class PrecipitationAnalyzerLambda implements RequestHandler<Map<String, O
     private final String latitude = ssmService.getSsmParameter("/windy/latitude");
     private final String longitude = ssmService.getSsmParameter("/windy/longitude");
 
-    private final long threeHoursInMili = 10800000;
-    private final long currentDate = Instant.now().toEpochMilli();
+    private static final long threeHoursInMili = 10800000;
+    private static final long currentDate = Instant.now().toEpochMilli();
 
-    private final String apiUrl = "https://api.windy.com/api/point-forecast/v2";
+    private static final String apiUrl = "https://api.windy.com/api/point-forecast/v2";
     private final HttpClient client = HttpClient.newHttpClient();
 
     private PrecipitationRecordsRepository precipitationRecords = new PrecipitationRecordsRepository(latitude, longitude);
@@ -47,13 +48,14 @@ public class PrecipitationAnalyzerLambda implements RequestHandler<Map<String, O
             log.info("Windy API request returned status {} with body: \n{}.\nPrevious weather response was {}", 
                 response.statusCode(), currentResponse, previousResponse);
 
-            if (currentResponse.get("ptype-surface") != previousResponse.get("ptype-surface")) {
+            if (!Objects.equals(currentResponse.get("ptype-surface"), previousResponse.get("ptype-surface"))) {
                 log.info("Precipitation type changed from {} to {}. Writing response in PrecipitationRecords",
                     previousResponse.get("ptype-surface"), currentResponse.get("ptype-surface"));
 
                 precipitationRecords.writePrecipitationResponseInDynamo(currentResponse);
 
-                if (previousResponse.get("ptype-surface") == 0 && currentResponse.get("ptype-surface") != 0) {
+                if (Objects.equals(previousResponse.get("ptype-surface"), 0L) && 
+                        !Objects.equals(currentResponse.get("ptype-surface"), 0L)) {
                     log.info("Precipitation has been detected in coordinates ({}, {}). Sending SMS alert to {}", 
                         latitude, longitude, System.getenv("PHONE_NUMBER"));
                     notificationService.sendNotification(

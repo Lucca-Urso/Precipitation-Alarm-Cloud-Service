@@ -9,6 +9,7 @@ import org.mockito.MockitoAnnotations;
 import service.SsmService;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,17 +25,17 @@ public class PrecipitationRecordsRepositoryTest {
     private PrecipitationRecordsRepository repository;
     
     @BeforeEach
-    public void setup() {
+    public void setup() throws Exception {
         MockitoAnnotations.openMocks(this);
-        when(ssmService.getSsmParameter("/windy/latitude")).thenReturn(anyString());
-        when(ssmService.getSsmParameter("/windy/longitude")).thenReturn(anyString());
+        when(ssmService.getSsmParameter("/windy/latitude")).thenReturn("40.7128");
+        when(ssmService.getSsmParameter("/windy/longitude")).thenReturn("-74.0060");
+        repository = new PrecipitationRecordsRepository("40.7128", "-74.0060");
         
-        repository = new PrecipitationRecordsRepository(
-            ssmService.getSsmParameter("/windy/latitude"),
-            ssmService.getSsmParameter("/windy/longitude")
-        );
+        Field tableField = PrecipitationRecordsRepository.class.getDeclaredField("table");
+        tableField.setAccessible(true);
+        tableField.set(repository, table);
     }
-    
+
     @Test
     public void shouldWriteRainingRecordWithLastAlertAt() {
         Map<String, Long> response = Map.of(

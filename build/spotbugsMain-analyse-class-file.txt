@@ -1,0 +1,5 @@
+C:\Users\Urso\OneDrive\Documents\ProgrammingProjects\Typescript\Precipitation-Alarm-Cloud-Service\build\classes\java\main\handler\PrecipitationAnalyzerLambda.class
+C:\Users\Urso\OneDrive\Documents\ProgrammingProjects\Typescript\Precipitation-Alarm-Cloud-Service\build\classes\java\main\model\PrecipitationRecordsModel.class
+C:\Users\Urso\OneDrive\Documents\ProgrammingProjects\Typescript\Precipitation-Alarm-Cloud-Service\build\classes\java\main\repository\PrecipitationRecordsRepository.class
+C:\Users\Urso\OneDrive\Documents\ProgrammingProjects\Typescript\Precipitation-Alarm-Cloud-Service\build\classes\java\main\service\SmsNotificationService.class
+C:\Users\Urso\OneDrive\Documents\ProgrammingProjects\Typescript\Precipitation-Alarm-Cloud-Service\build\classes\java\main\service\SsmService.class

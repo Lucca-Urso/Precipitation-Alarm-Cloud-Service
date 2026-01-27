@@ -10,6 +10,7 @@ import service.SmsNotificationService;
 import service.SsmService;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -37,17 +38,32 @@ public class PrecipitationAnalyzerLambdaTest {
     private PrecipitationAnalyzerLambda lambda;
     
     @BeforeEach
-    public void setup() {
+    public void setup() throws Exception {
         MockitoAnnotations.openMocks(this);
         lambda = new PrecipitationAnalyzerLambda();
-        when(ssmService.getSsmParameter("/windy/latitude")).thenReturn(anyString());
-        when(ssmService.getSsmParameter("/windy/longitude")).thenReturn(anyString());
-        when(ssmService.getSsmParameter("/windy/api-key")).thenReturn(anyString());
+        
+        Field clientField = PrecipitationAnalyzerLambda.class.getDeclaredField("client");
+        clientField.setAccessible(true);
+        clientField.set(lambda, httpClient);
+        
+        Field repoField = PrecipitationAnalyzerLambda.class.getDeclaredField("precipitationRecords");
+        repoField.setAccessible(true);
+        repoField.set(lambda, repository);
+        
+        Field notificationField = PrecipitationAnalyzerLambda.class.getDeclaredField("notificationService");
+        notificationField.setAccessible(true);
+        notificationField.set(lambda, notificationService);
     }
-    
+
     @Test
     public void shouldWritePrecipitationResponseAndSendAlert() throws IOException, InterruptedException {
-        String responseBody = "{\"ts\":[1700000000000,1700010800000],\"ptype-surface\":[0,1],\"rh-surface\":[60,70]}";
+        long currentTime = System.currentTimeMillis();
+        long threeHoursAgo = currentTime - 10800000;
+        
+        String responseBody = String.format(
+            "{\"ts\":[%d,%d],\"ptype-surface\":[0,1],\"rh-surface\":[60,70]}", threeHoursAgo, currentTime
+        );
+        
         when(httpResponse.body()).thenReturn(responseBody);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
@@ -60,7 +76,13 @@ public class PrecipitationAnalyzerLambdaTest {
 
     @Test
     public void shouldOnlyWritePrecipitationResponse() throws IOException, InterruptedException {
-        String responseBody = "{\"ts\":[1700000000000,1700010800000],\"ptype-surface\":[1,2],\"rh-surface\":[60,70]}";
+        long currentTime = System.currentTimeMillis();
+        long threeHoursAgo = currentTime - 10800000;
+        
+        String responseBody = String.format(
+            "{\"ts\":[%d,%d],\"ptype-surface\":[1,2],\"rh-surface\":[60,70]}", threeHoursAgo, currentTime
+        );
+        
         when(httpResponse.body()).thenReturn(responseBody);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
@@ -73,7 +95,13 @@ public class PrecipitationAnalyzerLambdaTest {
 
     @Test
     public void shoudNotWritePrecipitationResponse() throws IOException, InterruptedException {
-        String responseBody = "{\"ts\":[1700000000000,1700010800000],\"ptype-surface\":[1,1],\"rh-surface\":[60,70]}";
+        long currentTime = System.currentTimeMillis();
+        long threeHoursAgo = currentTime - 10800000;
+        
+        String responseBody = String.format(
+            "{\"ts\":[%d,%d],\"ptype-surface\":[1,1],\"rh-surface\":[60,70]}", threeHoursAgo, currentTime
+        );
+        
         when(httpResponse.body()).thenReturn(responseBody);
         when(httpResponse.statusCode()).thenReturn(200);
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
